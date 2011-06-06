@@ -5,6 +5,7 @@ class Expr {
 public:
   enum Kind {
     Integer,
+    Identifier,
     BinOp,
   };
 
@@ -27,6 +28,17 @@ public:
 
 private:
   int value;
+};
+
+class IdentifierExpr : public Expr {
+public:
+  IdentifierExpr(const std::string &name) : Expr(Identifier), name(name) {}
+
+public:
+  const std::string &getName() const { return name; }
+
+private:
+  std::string name;
 };
 
 class BinOpExpr : public Expr {

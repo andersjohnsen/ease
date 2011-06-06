@@ -17,6 +17,8 @@ ADD_EXECUTABLE(
   ir/Instruction.cpp
   ir/Function.cpp
 
+  opt/FunctionPass.cpp
+
   vm/Interpreter.cpp
   vm/X86Machine.cpp
   vm/Instructions.cpp

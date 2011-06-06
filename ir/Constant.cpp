@@ -4,7 +4,7 @@
 #include "ir/Type.h"
 
 ConstantInt::ConstantInt(uint64_t value) 
-  : Constant(Type::getIntType()), value(value) {
+  : Constant(ConstantIntKind, Type::getIntType()), value(value) {
 }
 
 std::string ConstantInt::asString() const {

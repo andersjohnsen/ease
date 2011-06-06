@@ -8,14 +8,19 @@
 
 #include "ir/Function.h"
 
+#include "opt/FunctionPass.h"
+
 #include "vm/Interpreter.h"
 #include "vm/X86Machine.h"
 
 int main(int argc, char **argv) {
   std::string input = 
-    "5 + 2 * 5 + 123 + 4 * 7";
-                      
-  std::cout << input;
+    "var x = 5 + 2 * 5 + 123 + 4 * 7;"
+    "var y = x * x;"
+    "if (y)"
+    "  y = y + 1;"
+    ""
+    "return y;";
 
   Lexer lexer;
 
@@ -29,10 +34,15 @@ int main(int argc, char **argv) {
   }
 
   Parser parser;
-  std::vector<Expr *> exprs = parser.parse(tokens, inStream);
+  std::vector<Stmt *> stmts = parser.parse(tokens, inStream);
 
   IRGen irgen;
-  Function *function = irgen.genFunction(exprs);
+  Function *function = irgen.genFunction(stmts);
+  function->dump();
+
+  ConstantFoldingPass constantFolding;
+  constantFolding.runFunction(function);
+
   function->dump();
 
 /*

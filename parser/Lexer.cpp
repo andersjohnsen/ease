@@ -21,8 +21,22 @@ void Token::print(std::istream &input) {
   std::cerr << toString(input);
 }
 
+Lexer::Lexer() {
+  keywords["var"] = KWVar;
+  keywords["if"] = KWIf;
+  keywords["return"] = KWReturn;
+}
+
 static bool isNum(int c) {
   return c >= '0' && c <= '9';
+}
+
+static bool isLetter(int c) {
+  return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
+static bool isLetterOrNum(int c) {
+  return isLetter(c) || isNum(c);
 }
 
 std::vector<Token> Lexer::lex(std::istream &input) {
@@ -50,12 +64,59 @@ std::vector<Token> Lexer::lex(std::istream &input) {
         tokens.push_back(Token(Number, pos, int(input.tellg()) - pos));
         break;
 
+      case 'a': case 'b': case 'c': case 'd': case 'e':
+      case 'f': case 'g': case 'h': case 'i': case 'j':
+      case 'k': case 'l': case 'm': case 'n': case 'o':
+      case 'p': case 'q': case 'r': case 's': case 't':
+      case 'u': case 'v': case 'w': case 'x': case 'y': case 'z':
+      case 'A': case 'B': case 'C': case 'D': case 'E':
+      case 'F': case 'G': case 'H': case 'I': case 'J':
+      case 'K': case 'L': case 'M': case 'N': case 'O':
+      case 'P': case 'Q': case 'R': case 'S': case 'T':
+      case 'U': case 'V': case 'W': case 'X': case 'Y': case 'Z':
+      case '_': {
+        std::string s;
+        s += (char)c;
+        while (input.good() && isLetterOrNum(input.peek()) ) {
+          c = input.get();
+          s += (char)c;
+        }
+        TokenKind kind = Identifier;
+        if (keywords.find(s) != keywords.end())
+          kind = keywords[s];
+        tokens.push_back(Token(kind, pos, int(input.tellg()) - pos));
+        break;
+      }
+      case ';':
+        tokens.push_back(Token(SemiColon, pos, 1));
+        break;
+
+      case '=':
+        tokens.push_back(Token(Equal, pos, 1));
+        break;
+
       case '+':
         tokens.push_back(Token(Plus, pos, 1));
         break;
 
       case '*':
         tokens.push_back(Token(Star, pos, 1));
+        break;
+
+      case '(':
+        tokens.push_back(Token(LParam, pos, 1));
+        break;
+
+      case ')':
+        tokens.push_back(Token(RParam, pos, 1));
+        break;
+
+      case '{':
+        tokens.push_back(Token(LBrace, pos, 1));
+        break;
+
+      case '}':
+        tokens.push_back(Token(RBrace, pos, 1));
         break;
 
       default:

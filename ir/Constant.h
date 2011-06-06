@@ -7,7 +7,10 @@
 
 class Constant : public Value {
 protected:
-  Constant(const Type *type) : Value(type) {}
+  Constant(Kind kind, const Type *type) : Value(kind, type) {}
+
+public:
+  bool isConstant() const { return true; }
 };
 
 class ConstantInt : public Constant {
@@ -16,6 +19,8 @@ public:
 
 public:
   std::string asString() const;
+
+  uint64_t getValue() const { return value; }
 
 private:
   uint64_t value;

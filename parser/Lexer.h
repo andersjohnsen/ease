@@ -2,14 +2,29 @@
 #define LEXER_H
 
 #include <vector>
+#include <map>
 #include <istream>
 
 enum TokenKind {
   EndOfFile,
 
+  Identifier,
   Number,
+
+  SemiColon,
+  Equal,
+
   Plus,
   Star,
+
+  LParam,
+  RParam,
+  LBrace,
+  RBrace,
+
+  KWVar,
+  KWIf,
+  KWReturn,
 
   NUM_TOKEN_KIND
 };
@@ -29,10 +44,13 @@ struct Token{
 
 class Lexer {
 public:
-  Lexer() {}
+  Lexer();
   
 public:
   std::vector<Token> lex(std::istream &buffer);
+
+private:
+  std::map<std::string, TokenKind> keywords;
 };
 
 #endif // LEXER_H

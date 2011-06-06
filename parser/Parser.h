@@ -6,20 +6,23 @@
 #include "parser/Lexer.h"
 
 class Expr;
+class Stmt;
 
 class Parser {
 public:
   Parser();
 
 public:
-  std::vector<Expr *> parse(const std::vector<Token> &tokens, std::istream &input);
+  std::vector<Stmt *> parse(const std::vector<Token> &tokens, std::istream &input);
 
 private:
+  Stmt *parseStmt();
   Expr *parseExpr(int i = 0);
   Expr *parsePrimaryExpr();
 
   Token next();
   Token peek(int o = 0);
+  Token require(TokenKind kind);
   bool is_a(TokenKind kind, int o = 0);
 
   std::string toString(Token t);

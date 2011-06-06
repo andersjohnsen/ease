@@ -9,9 +9,11 @@ protected:
 
 public:
   static const IntegerType *getIntType() { return intType; }
+  static const Type *getVoidType() { return voidType; }
 
 private:
   static const IntegerType *intType;
+  static const Type *voidType;
 };
 
 class IntegerType : public Type {

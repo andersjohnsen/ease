@@ -3,14 +3,35 @@
 
 #include "ir/Function.h"
 #include "ir/Instruction.h"
+#include "ir/Type.h"
+
+Block::Block(const std::string &name, Function *function) 
+    : Value(BlockKind, Type::getVoidType()), name(name), function(function) {
+  function->addBlock(this);
+}
 
 void Block::addInstruction(Instruction *inst) {
   instructions.push_back(inst);
   function->setInstructionName(inst);
 }
+
+void Block::removeInstruction(Instruction *inst) {
+  for (std::vector<Instruction *>::iterator it = instructions.begin(),
+                                            end = instructions.end();
+       it != end; it++) {
+    if (*it == inst) {
+      instructions.erase(it);
+      return;
+    }
+  }
+}
+
+std::string Block::asString() const {
+  return "#" + name;
+}
   
 void Block::dump() const {
-  std::cerr << " #block:\n";
+  std::cerr << " #" << name << ":\n";
 
   for (int i = 0; i < instructions.size(); i++) {
     instructions[i]->dump();
@@ -20,7 +41,7 @@ void Block::dump() const {
 }
 
 Function::Function() {
-  blocks.push_back(new Block(this));
+  new Block("entry", this);
 }
   
 void Function::setInstructionName(Instruction *inst) {
@@ -39,6 +60,21 @@ void Function::setInstructionName(Instruction *inst) {
 
   instructions[nameBuf] = inst;
   inst->setName(nameBuf);
+}
+
+void Function::replaceValue(Value *old, Value *newValue) {
+  for (std::multimap<Value *, Instruction *>::iterator 
+       it = valueUses.equal_range(old).first,
+       end = valueUses.equal_range(old).second;
+       it != end; it++) {
+    it->second->replaceValue(old, newValue);
+    valueUsed(newValue, it->second);
+  }
+  valueUses.erase(old);
+}
+
+void Function::valueUsed(Value *v, Instruction *inst) {
+  valueUses.insert(std::pair<Value *, Instruction *>(v, inst));
 }
   
 void Function::dump() const {
